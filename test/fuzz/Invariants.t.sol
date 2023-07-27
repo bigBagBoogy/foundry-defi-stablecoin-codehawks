@@ -73,7 +73,16 @@ contract Invariants is StdInvariant, Test {
 
     // bigBagBoogy: So I think this would be the most basic thing a noob would try to exploit.
     function invariant_userCanNeverRedeemMoreThanTheirCollateral() public view {
+        // 1. We should first create a user.
+        // 2. We should give him balance (deal or hoax?)
+        // 3. The user should deposit collateral.
+        // 4. the user should redeem more than their collateral.
+        // 4a. alternatively the user should try to redeem wbtc when he has weth.
         // if we redeem, we always redeem in the collateral(either weth or wbtc) so no need for USD conversions.
-        assert(amountRedeemed <= collateralValue);
+        dsce.depositCollateral(address(weth), 1);
+        uint256 amountCollateral;
+        uint256 amountRedeemed;
+
+        assert(amountRedeemed <= amountCollateral); // or should we reverse this? does it matter?
     }
 }

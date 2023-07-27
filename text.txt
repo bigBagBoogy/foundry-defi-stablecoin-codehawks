@@ -28,4 +28,29 @@ However, despite these built-in checks, there are still scenarios where arithmet
 
 To find the exact cause of the failure, the contract's code and its interactions with other contracts or libraries should be carefully reviewed. It's also essential to consider any external factors like blockchain state changes, inputs from users, oracles, and chain data.
 
-When encountering such issues, it's recommended to use extensive unit testing, including corner cases and boundary inputs, to ensure the contract functions as expected and to catch any edge cases where arithmetic overflow/underflow might still occur. Additionally, auditing the contract code by a security expert can help identify potential issues and vulnerabilities.
+When encountering such issues, it's recommended to use extensive unit testing, including corner
+
+ cases and boundary inputs, to ensure the contract functions as expected and to catch any edge cases where arithmetic overflow/underflow might still occur. Additionally, auditing the contract code by a security expert can help identify potential issues and vulnerabilities.
+
+
+ function invariant_userCanNeverRedeemMoreThanTheirCollateral() public view {
+    // Create a user address (you can use a helper function to do this)
+    address user = address(0x...);
+
+    // Assign balance to the user (you can use a helper function to do this)
+    // For example: dsc.mint(user, 1000);
+
+    // The user should deposit collateral (you can use the handler function to do this)
+    dsce.depositCollateral(address(weth), 1);
+
+    // Get the user's collateral balance
+    uint256 amountCollateral = dsce.getCollateralBalanceOfUser(user, address(weth));
+
+    // Try to redeem DSC tokens more than the collateral value (you can use the handler function to do this)
+    // For example: dsce.redeemDsc(1000);
+
+    // Get the user's DSC balance after redemption
+    uint256 amountDsc = dsc.balanceOf(user);
+
+    assert(amountDsc <= amountCollateral);
+}
