@@ -59,6 +59,6 @@ contract Invariants is StdInvariant, Test {
         // 4a. alternatively the user should try to redeem wbtc when he has weth.
         // if we redeem, we always redeem in the collateral(either weth or wbtc) so no need for USD conversions.
 
-        assert(amountRedeemed <= amountCollateral); // or should we reverse this? does it matter?
+        assert(amountRedeemed <= amountCollateral); // with the hardcoded values here this should always fail.
     }
 }
