@@ -34,55 +34,50 @@ contract Invariants is StdInvariant, Test {
         // targetContract(address(dsce));
         handler = new Handler(dsce, dsc);
         targetContract(address(handler));
-    }
+    } 
 
-    function invariant_protocolMustHaveMoreValueThanTotalSupply() public view {
-        // get the value of all the collateral in the protocol
-        // compare it to all the debt (dsc)
-        uint256 totalSupply = dsc.totalSupply();
-        uint256 totalWethDeposited = IERC20(weth).balanceOf(address(dsce));
-        uint256 totalBtcDeposited = IERC20(wbtc).balanceOf(address(dsce));
-
-        uint256 wethValue = dsce.getUsdValue(weth, totalWethDeposited);
-        uint256 wbtcValue = dsce.getUsdValue(wbtc, totalBtcDeposited);
-
-        console.log("weth value: ", wethValue);
-        console.log("wbtc value: ", wbtcValue);
-        console.log("total supply: ", totalSupply);
-        console.log("Times mint called: ", handler.timesMintIsCalled());
-
-        assert(wethValue + wbtcValue >= totalSupply);
-    }
-
-    // function invariant_gettersCantRevert() public view {
-    //     dsce.getAdditionalFeedPrecision();
-    //     dsce.getCollateralTokens();
-    //     dsce.getLiquidationBonus();
-    //     dsce.getLiquidationBonus();
-    //     dsce.getLiquidationThreshold();
-    //     dsce.getMinHealthFactor();
-    //     dsce.getPrecision();
-    //     dsce.getDsc();
-    //     dsce.getTokenAmountFromUsd();
-    //     dsce.getCollateralTokenPriceFeed();
-    //     dsce.getCollateralBalanceOfUser();
-    //     getAccountCollateralValue();
-    // }
-
-    // Should add more invariant tests for the rest of the getters...
 
     // bigBagBoogy: So I think this would be the most basic thing a noob would try to exploit.
     function invariant_userCanNeverRedeemMoreThanTheirCollateral() public view {
         // 1. We should first create a user.
-        // 2. We should give him balance (deal or hoax?)
+        vm.startPrank(user);  // 1 user must do deposit  2 user must then do redeem deposit
+        // 2. We should give him balance     using vm.deal?
+        ERC20Mock(weth).approve(address(dsce), amountCollateral); //ChatGPT3.5 ! does this tranfer amountCollateral to user, or not yet?
+        vm.deal(user, amountCollateral); // do we need this?
+        (totalDscMinted, collateralValueInUsd) = dsce.getAccountInformation(user);
+        console.log(collateralValueInUsd[user]); // will this print the users
         // 3. The user should deposit collateral.
+                dsce.depositCollateral(address(weth), amountCollateral); //ChatGPT3.5 !  Who calls this function?
+
         // 4. the user should redeem more than their collateral.
         // 4a. alternatively the user should try to redeem wbtc when he has weth.
         // if we redeem, we always redeem in the collateral(either weth or wbtc) so no need for USD conversions.
-        dsce.depositCollateral(address(weth), 1);
+        
         uint256 amountCollateral;
         uint256 amountRedeemed;
 
         assert(amountRedeemed <= amountCollateral); // or should we reverse this? does it matter?
     }
+    function invariant_userCanNeverRedeemMoreThanTheirCollateral() public view {
+    // Create a user address (you can use a helper function to do this)
+    address user = address(0x...);
+
+    // Assign balance to the user (you can use a helper function to do this)
+    // For example: dsc.mint(user, 1000);
+
+    // The user should deposit collateral (you can use the handler function to do this)
+    dsce.depositCollateral(address(weth), 1);
+
+    // Get the user's collateral balance
+    uint256 amountCollateral = dsce.getCollateralBalanceOfUser(user, address(weth));
+
+    // Try to redeem DSC tokens more than the collateral value (you can use the handler function to do this)
+    // For example: dsce.redeemDsc(1000);
+
+    // Get the user's DSC balance after redemption
+    uint256 amountDsc = dsc.balanceOf(user);
+
+    assert(amountDsc <= amountCollateral);
+}
+
 }

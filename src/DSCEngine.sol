@@ -302,6 +302,15 @@ contract DSCEngine is ReentrancyGuard {
         totalDscMinted = s_DSCMinted[user];
         collateralValueInUsd = getAccountCollateralValue(user);
     }
+    ///BBB function  get the amount, but not the value
+
+    function _getCollateralAmountOfUser(address user, address token)
+        private
+        view
+        returns (uint256 collateralAmountOfUser)
+    {
+        collateralAmountOfUser = s_collateralDeposited[user][token];
+    }
 
     /*
      * Returns how close to liquidation a user is
