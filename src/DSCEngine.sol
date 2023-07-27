@@ -304,12 +304,13 @@ contract DSCEngine is ReentrancyGuard {
     }
     ///BBB function  get the amount, but not the value
 
-    function _getCollateralAmountOfUser(address user, address token)
-        private
+    function getCollateralAmountOfUser(address user, address token)
+        public
         view
         returns (uint256 collateralAmountOfUser)
     {
         collateralAmountOfUser = s_collateralDeposited[user][token];
+        return collateralAmountOfUser;
     }
 
     /*

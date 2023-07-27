@@ -2,12 +2,13 @@
 
 Writing a new invariant: invariant_userCanNeverRedeemMoreThanTheirCollateral
 Writing a new getter @ line:307
+//vm.deal(user, amountCollateral); // do we need this? probably not
 
 # end BBB
 
 [FAIL. Reason: Arithmetic over/underflow]
 [Sequence]
-sender=0x7e4a4154d260f6d4a97c105d883667319dd6a613 addr=[test/fuzz/Handler.t.sol:Handler]0x2a9e8fa175f45b235efddd97d2727741ef4eee63 calldata=depositCollateral(uint256,uint256), args=[22684029450969151516589027285 ******\*\*******\*\*******\*\******* etc etc
+sender=0x7e4a4154d260f6d4a97c105d883667319dd6a613 addr=[test/fuzz/Handler.t.sol:Handler]0x2a9e8fa175f45b235efddd97d2727741ef4eee63 calldata=depositCollateral(uint256,uint256), args=[22684029450969151516589027285 **\*\***\*\***\*\***\*\***\*\***\*\***\*\*** etc etc
 
 TO AI: This contract is written in version 0.8.19. And: Solidity 0.8 checks overflow/underflow by default 8. In other words, if you are using >= 0.8 , there might not need to import and use the SafeMath library anymore. So come there has been a "[FAIL. Reason: Arithmetic over/underflow]"?
 
