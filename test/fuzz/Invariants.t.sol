@@ -54,20 +54,26 @@ contract Invariants is StdInvariant, Test {
         assert(wethValue + wbtcValue >= totalSupply);
     }
 
-    function invariant_gettersCantRevert() public view {
-        dsce.getAdditionalFeedPrecision();
-        dsce.getCollateralTokens();
-        dsce.getLiquidationBonus();
-        dsce.getLiquidationBonus();
-        dsce.getLiquidationThreshold();
-        dsce.getMinHealthFactor();
-        dsce.getPrecision();
-        dsce.getDsc();
-        // dsce.getTokenAmountFromUsd();
-        // dsce.getCollateralTokenPriceFeed();
-        // dsce.getCollateralBalanceOfUser();
-        // getAccountCollateralValue();
-    }
+    // function invariant_gettersCantRevert() public view {
+    //     dsce.getAdditionalFeedPrecision();
+    //     dsce.getCollateralTokens();
+    //     dsce.getLiquidationBonus();
+    //     dsce.getLiquidationBonus();
+    //     dsce.getLiquidationThreshold();
+    //     dsce.getMinHealthFactor();
+    //     dsce.getPrecision();
+    //     dsce.getDsc();
+    //     dsce.getTokenAmountFromUsd();
+    //     dsce.getCollateralTokenPriceFeed();
+    //     dsce.getCollateralBalanceOfUser();
+    //     getAccountCollateralValue();
+    // }
 
     // Should add more invariant tests for the rest of the getters...
+
+    // bigBagBoogy: So I think this would be the most basic thing a noob would try to exploit.
+    function invariant_userCanNeverRedeemMoreThanTheirCollateral() public view {
+        // if we redeem, we always redeem in the collateral(either weth or wbtc) so no need for USD conversions.
+        assert(amountRedeemed <= collateralValue);
+    }
 }
