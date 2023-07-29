@@ -3,6 +3,7 @@
 Writing a new invariant: invariant_userCanNeverRedeemMoreThanTheirCollateral
 Writing a new getter @ line:307
 //vm.deal(user, amountCollateral); // do we need this? probably not
+Scince the writing of the handler/invariants is hard, let's firt build the test function in unit tests.
 
 Test idea: Can we deposit 1000USD worth of ETH and then redeem 1000USD of BTC?
 

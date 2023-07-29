@@ -119,9 +119,10 @@ contract HandlerBBB is Test {
 
         // Perform the depositCollateral function call with the same arguments that caused the failure
         vm.startPrank(msg.sender);
-        collateral.mint(msg.sender, amountCollateral);
-        collateral.approve(address(dsce), amountCollateral);
-        dsce.depositCollateral(address(collateral), amountCollateral);
+        collateral.mint(msg.sender, amountCollateral); //make it
+        collateral.approve(address(dsce), amountCollateral); //approve dsce to deposit on behalf
+        dsce.depositCollateral(address(collateral), amountCollateral); // have dsce deposit
+        //dsce.redeemCollateral(address(weth), amountCollateral+1);
         vm.stopPrank();
         usersWithCollateralDeposited.push(msg.sender);
 
