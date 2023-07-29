@@ -3,7 +3,7 @@
 
 pragma solidity ^0.8.18;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {DSCEngine} from "../../src/DSCEngine.sol";
 import {DecentralizedStableCoin} from "../../src/DecentralizedStableCoin.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
@@ -45,7 +45,6 @@ contract Handler is Test {
         dsce.depositCollateral(address(collateral), amountCollateral);
         vm.stopPrank();
         usersWithCollateralDeposited.push(msg.sender);
-        console.log("usersWithCollateralDeposited: ", usersWithCollateralDeposited.length);
     }
 
     function redeemCollateral(uint256 collateralSeed, uint256 amountCollateral) public {
@@ -54,12 +53,10 @@ contract Handler is Test {
         amountCollateral = bound(amountCollateral, 0, maxCollateralToRedeem);
         if (amountCollateral == 0) {
             timesAmountCollateralWasZero++;
-            console.log("timesAmountCollateralWasZero: ", timesAmountCollateralWasZero);
             return;
         }
         dsce.redeemCollateral(address(collateral), amountCollateral);
         //console.log("collateral: ", collateral.address);
-        console.log("amountCollateral: ", amountCollateral);
     }
     // Helper Functions
 
