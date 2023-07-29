@@ -44,6 +44,7 @@ contract Invariants is StdInvariant, Test {
         handler = new Handler(dsce, dsc);
         targetContract(address(handler));
     }
+    // I'm contemplating about the neccesity of a deposit function. We only wish to withdraw too much, so we don't need a deposit function.
 
     function invariant_userCanNeverRedeemMoreThanTheirCollateral() public view {
         console.log("timesAmountCollateralWasZero: ", timesAmountCollateralWasZero);
