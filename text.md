@@ -3,9 +3,13 @@
 Writing a new invariant: invariant_userCanNeverRedeemMoreThanTheirCollateral
 Writing a new getter @ line:307
 //vm.deal(user, amountCollateral); // do we need this? probably not
-Scince the writing of the handler/invariants is hard, let's firt build the test function in unit tests.
+Scince the writing of the handler/invariants is hard, let's first build the test function in unit tests. line 334 \_redeemCollateral is @ line 282 redeemCollateral is @ 183
 
 Test idea: Can we deposit 1000USD worth of ETH and then redeem 1000USD of BTC?
+
+There's both solidity 0.8.18 and 0.8.19 versions used.
+
+slither proberen. Python 3.10.6
 
 # end BBB
 
