@@ -25,7 +25,8 @@ contract Handler is Test {
     uint256 MAX_DEPOSIT_SIZE = type(uint96).max; // the max uint96 value
     uint256 public timesAmountCollateralWasZero;
     uint256 public amountOfUsersWithCollateralDeposited;
-    uint256 public totalRedeemedAmountCollateral =;
+    uint256 public totalRedeemedAmountCollateral;
+    uint256 public timesAmountCollateralWasRedeemed;
 
     constructor(DSCEngine _dscEngine, DecentralizedStableCoin _dsc) {
         dsce = _dscEngine;
@@ -38,19 +39,20 @@ contract Handler is Test {
         ethUsdPriceFeed = MockV3Aggregator(dsce.getCollateralTokenPriceFeed(address(weth)));
     }
 
-    function depositCollateral(uint256 collateralSeed, uint256 amountCollateral) public {
-        ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
-        amountCollateral = bound(amountCollateral, 1, MAX_DEPOSIT_SIZE);
+    // function depositCollateral(uint256 collateralSeed, uint256 amountCollateral) public {
+    //     ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
+    //     amountCollateral = bound(amountCollateral, 1, MAX_DEPOSIT_SIZE);
 
-        vm.startPrank(msg.sender);
-        collateral.mint(msg.sender, amountCollateral);
-        collateral.approve(address(dsce), amountCollateral);
-        dsce.depositCollateral(address(collateral), amountCollateral);
-        vm.stopPrank();
-        usersWithCollateralDeposited.push(msg.sender);
-        amountOfUsersWithCollateralDeposited++;
-    }
-// right now redeem does not get called or with 0.
+    //     vm.startPrank(msg.sender);
+    //     collateral.mint(msg.sender, amountCollateral);
+    //     collateral.approve(address(dsce), amountCollateral);
+    //     dsce.depositCollateral(address(collateral), amountCollateral);
+    //     vm.stopPrank();
+    //     usersWithCollateralDeposited.push(msg.sender);
+    //     amountOfUsersWithCollateralDeposited++;
+    // }
+    // right now redeem does not get called or with 0.
+
     function redeemCollateral(uint256 collateralSeed, uint256 redeemAmountCollateral) public {
         ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
         uint256 maxCollateralToRedeem = dsce.getCollateralBalanceOfUser(msg.sender, address(collateral));
@@ -61,11 +63,16 @@ contract Handler is Test {
         }
         dsce.redeemCollateral(address(collateral), redeemAmountCollateral);
         totalRedeemedAmountCollateral += redeemAmountCollateral;
+        timesAmountCollateralWasRedeemed++;
         //console.log("collateral: ", collateral.address);
     }
 
     function getTimesAmountCollateralWasZero() public view returns (uint256) {
         return (timesAmountCollateralWasZero);
+    }
+
+    function getTimesAmountCollateralWasRedeemed() public view returns (uint256) {
+        return (timesAmountCollateralWasRedeemed);
     }
 
     function getAmountOfUsersWithCollateralDeposited() public view returns (uint256) {

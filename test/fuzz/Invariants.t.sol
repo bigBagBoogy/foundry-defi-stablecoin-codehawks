@@ -70,6 +70,7 @@ contract InvariantsTest is StdInvariant, Test {
         uint256 amountOfUsersWithCollateralDeposited = handler.getAmountOfUsersWithCollateralDeposited();
         uint256 totalCollateralDeposited = wethValue + wbtcValue;
         uint256 totalRedeemedAmountCollateral = handler.getTotalRedeemedAmountCollateral();
+        uint256 timesAmountCollateralWasRedeemed = handler.getTimesAmountCollateralWasRedeemed();
         //321231955747157833148424860484000
         //319072302902107591761300334681000
 
@@ -83,6 +84,7 @@ contract InvariantsTest is StdInvariant, Test {
         console.log("amountOfUsersWithCollateralDeposited: ", amountOfUsersWithCollateralDeposited);
         console.log("totalCollateralDeposited: ", totalCollateralDeposited);
         console.log("totalRedeemedAmountCollateral: ", totalRedeemedAmountCollateral);
+        console.log("timesAmountCollateralWasRedeemed: ", timesAmountCollateralWasRedeemed);
 
         assert(totalRedeemedAmountCollateral <= totalCollateralDeposited);
     }
