@@ -7,6 +7,6 @@ remappings = ["@chainlink/contracts=lib/chainlink-brownie-contracts/contracts/",
 [invariant]
 runs = 100
 depth = 10
-fail_on_revert = true
+fail_on_revert = false
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

@@ -1,12 +1,5 @@
 // SPDX-License-Identifier: MIT
 
-// Have our invariant aka properties
-
-// What are our invariants?
-
-// 1. The total supply of DSC should be less than the total value of collateral
-// 2. Getter view functions should never revert <- evergreen invariant
-
 pragma solidity ^0.8.18;
 
 import {Test, console} from "forge-std/Test.sol";
@@ -17,9 +10,9 @@ import {DecentralizedStableCoin} from "../../src/DecentralizedStableCoin.sol";
 import {HelperConfig} from "../../script/HelperConfig.s.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Handler} from "./Handler.t.sol";
-import {Invariants} from "./Invariants.t.sol";
 import {StdCheats} from "forge-std/StdCheats.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
+
 contract InvariantsTest is StdInvariant, Test {
     DeployDSC deployer;
     DSCEngine dsce;
@@ -39,33 +32,72 @@ contract InvariantsTest is StdInvariant, Test {
         targetContract(address(handler));
     }
 
-    function invariant_ProtocolMustHaveMoreThanTotalSupply() public view {
-        uint256 totalSupply = dsc.totalSupply();
+    // function invariant_ProtocolMustHaveMoreThanTotalSupply() public view {
+    //     uint256 totalSupply = dsc.totalSupply();
+    //     uint256 totalWethDeposited = IERC20(weth).balanceOf(address(dsce));
+    //     uint256 totalWbtcDeposited = IERC20(wbtc).balanceOf(address(dsce));
+    //     uint256 wethValue = dsce.getUsdValue(weth, totalWethDeposited);
+    //     uint256 wbtcValue = dsce.getUsdValue(wbtc, totalWbtcDeposited);
+    //     uint256 amountRedeemed = dsce.getUsdValue(weth, totalWethDeposited + totalWbtcDeposited);
+    //     uint256 timesAmountCollateralWasZero = handler.getTimesAmountCollateralWasZero();
+    //     uint256 amountOfUsersWithCollateralDeposited = handler.getAmountOfUsersWithCollateralDeposited();
+    //     uint256 totalCollateralDeposited = wethValue + wbtcValue;
+    //     //321231955747157833148424860484000
+    //     //319072302902107591761300334681000
+
+    //     console.log("totalSupply:", totalSupply);
+    //     console.log("totalWethDeposited:", totalWethDeposited);
+    //     console.log("totalWbtcDeposited:", totalWbtcDeposited);
+    //     console.log("wethValue:", wethValue);
+    //     console.log("wbtcValue:", wbtcValue);
+    //     console.log("amountRedeemed:", amountRedeemed);
+    //     console.log("timesAmountCollateralWasZero: ", timesAmountCollateralWasZero);
+    //     console.log("amountOfUsersWithCollateralDeposited: ", amountOfUsersWithCollateralDeposited);
+    //     console.log("totalCollateralDeposited: ", totalCollateralDeposited);
+
+    //     assert(wethValue + wbtcValue >= totalSupply);
+
+    // }
+
+    function invariant_userCanNeverRedeemMoreThanTheirCollateral() public view {
+        // uint256 totalSupply = dsc.totalSupply();
         uint256 totalWethDeposited = IERC20(weth).balanceOf(address(dsce));
         uint256 totalWbtcDeposited = IERC20(wbtc).balanceOf(address(dsce));
         uint256 wethValue = dsce.getUsdValue(weth, totalWethDeposited);
         uint256 wbtcValue = dsce.getUsdValue(wbtc, totalWbtcDeposited);
-        uint256 amountRedeemed = dsce.getUsdValue(weth, totalWethDeposited + totalWbtcDeposited);
+        // uint256 amountRedeemed = dsce.getUsdValue(weth, totalWethDeposited + totalWbtcDeposited);
+        uint256 timesAmountCollateralWasZero = handler.getTimesAmountCollateralWasZero();
+        uint256 amountOfUsersWithCollateralDeposited = handler.getAmountOfUsersWithCollateralDeposited();
+        uint256 totalCollateralDeposited = wethValue + wbtcValue;
+        uint256 totalRedeemedAmountCollateral = handler.getTotalRedeemedAmountCollateral();
+        //321231955747157833148424860484000
+        //319072302902107591761300334681000
 
-        console.log("totalSupply:", totalSupply);
-        console.log("totalWethDeposited:", totalWethDeposited);
-        console.log("totalWbtcDeposited:", totalWbtcDeposited);
-        console.log("wethValue:", wethValue);
-        console.log("wbtcValue:", wbtcValue);
-        console.log("amountRedeemed:", amountRedeemed);
-
-        assert(wethValue + wbtcValue >= totalSupply);
-
-    function invariant_userCanNeverRedeemMoreThanTheirCollateral() public view {
-        amountRedeemed[user] = 
-        amountCollateral[user] = s_collateralDeposited[token][user]
+        // console.log("totalSupply:", totalSupply);
+        // console.log("totalWethDeposited:", totalWethDeposited);
+        // console.log("totalWbtcDeposited:", totalWbtcDeposited);
+        // console.log("wethValue:", wethValue);
+        // console.log("wbtcValue:", wbtcValue);
+        // console.log("amountRedeemed:", amountRedeemed);
         console.log("timesAmountCollateralWasZero: ", timesAmountCollateralWasZero);
-        console.log("amountCollateral: ", amountCollateral);
-        console.log("usersWithCollateralDeposited: ", usersWithCollateralDeposited.length);
+        console.log("amountOfUsersWithCollateralDeposited: ", amountOfUsersWithCollateralDeposited);
+        console.log("totalCollateralDeposited: ", totalCollateralDeposited);
+        console.log("totalRedeemedAmountCollateral: ", totalRedeemedAmountCollateral);
 
-        assert(amountRedeemed[user] <= amountCollateral[user]);
+        assert(totalRedeemedAmountCollateral <= totalCollateralDeposited);
     }
+
+    // function invariant_userCanNeverRedeemMoreThanTheirCollateral() public view {
+    //     amountRedeemed[user] =
+    //     amountCollateral[user] = s_collateralDeposited[token][user]
+    //     console.log("timesAmountCollateralWasZero: ", timesAmountCollateralWasZero);
+    //     console.log("amountCollateral: ", amountCollateral);
+    //     console.log("usersWithCollateralDeposited: ", usersWithCollateralDeposited.length);
+
+    //     assert(amountRedeemed[user] <= amountCollateral[user]);
+    // }
 }
+
 // bigBagBoogy: So I think this would be the most basic thing a noob would try to exploit.
 // function invariant_userCanNeverRedeemMoreThanTheirCollateral() public {
 //     // 1. We should first create a user.

@@ -8,6 +8,7 @@ import {DSCEngine} from "../../src/DSCEngine.sol";
 import {DecentralizedStableCoin} from "../../src/DecentralizedStableCoin.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
 import {MockV3Aggregator} from "../mocks/MockV3Aggregator.sol";
+import {console} from "forge-std/console.sol";
 
 // Price Feed
 
@@ -23,6 +24,8 @@ contract Handler is Test {
 
     uint256 MAX_DEPOSIT_SIZE = type(uint96).max; // the max uint96 value
     uint256 public timesAmountCollateralWasZero;
+    uint256 public amountOfUsersWithCollateralDeposited;
+    uint256 public totalRedeemedAmountCollateral =;
 
     constructor(DSCEngine _dscEngine, DecentralizedStableCoin _dsc) {
         dsce = _dscEngine;
@@ -45,19 +48,34 @@ contract Handler is Test {
         dsce.depositCollateral(address(collateral), amountCollateral);
         vm.stopPrank();
         usersWithCollateralDeposited.push(msg.sender);
+        amountOfUsersWithCollateralDeposited++;
     }
-
-    function redeemCollateral(uint256 collateralSeed, uint256 amountCollateral) public {
+// right now redeem does not get called or with 0.
+    function redeemCollateral(uint256 collateralSeed, uint256 redeemAmountCollateral) public {
         ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
         uint256 maxCollateralToRedeem = dsce.getCollateralBalanceOfUser(msg.sender, address(collateral));
-        amountCollateral = bound(amountCollateral, 0, maxCollateralToRedeem);
-        if (amountCollateral == 0) {
+        redeemAmountCollateral = bound(redeemAmountCollateral, maxCollateralToRedeem, maxCollateralToRedeem + 10);
+        if (redeemAmountCollateral == 0) {
             timesAmountCollateralWasZero++;
             return;
         }
-        dsce.redeemCollateral(address(collateral), amountCollateral);
+        dsce.redeemCollateral(address(collateral), redeemAmountCollateral);
+        totalRedeemedAmountCollateral += redeemAmountCollateral;
         //console.log("collateral: ", collateral.address);
     }
+
+    function getTimesAmountCollateralWasZero() public view returns (uint256) {
+        return (timesAmountCollateralWasZero);
+    }
+
+    function getAmountOfUsersWithCollateralDeposited() public view returns (uint256) {
+        return (amountOfUsersWithCollateralDeposited);
+    }
+
+    function getTotalRedeemedAmountCollateral() public view returns (uint256) {
+        return (totalRedeemedAmountCollateral);
+    }
+
     // Helper Functions
 
     function _getCollateralFromSeed(uint256 collateralSeed) private view returns (ERC20Mock) {
