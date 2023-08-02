@@ -20,38 +20,50 @@ import {Handler} from "./Handler.t.sol";
 import {Invariants} from "./Invariants.t.sol";
 import {StdCheats} from "forge-std/StdCheats.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
-
-contract Invariants is StdInvariant, Test {
+contract InvariantsTest is StdInvariant, Test {
     DeployDSC deployer;
     DSCEngine dsce;
     DecentralizedStableCoin dsc;
-    HelperConfig config;
+    HelperConfig helperConfig;
+    address ethUsdPriceFeed;
+    address btcUsdPriceFeed;
     address weth;
     address wbtc;
     Handler handler;
-    Invariants invariants;
-    address public user = address(1);
-    uint256 amountCollateral; // = 1 ether; //1e18 weth
-    uint256 amountRedeemed; // = 2 ether; //2e18 weth
-    uint256 timesAmountCollateralWasZero;
-    uint256[] usersWithCollateralDeposited;
 
     function setUp() external {
-        deployer = new DeployDSC();
-        (dsc, dsce, config) = deployer.run();
-        (,, weth, wbtc,) = config.activeNetworkConfig();
-        // targetContract(address(dsce));
+        deployer = new DeployDSC(); // we run the deploy script which will run the HelperConfig(), DecentralizedStableCoin(), and the DSCEngine().
+        (dsc, dsce, helperConfig) = deployer.run(); //running deploy will return (dsc, dsce, helperConfig) objects. (DecentralizedStableCoin, DSCEngine, HelperConfig)
+        (ethUsdPriceFeed,, weth, wbtc,) = helperConfig.activeNetworkConfig();
         handler = new Handler(dsce, dsc);
         targetContract(address(handler));
     }
-    // I'm contemplating about the neccesity of a deposit function. We only wish to withdraw too much, so we don't need a deposit function.
+
+    function invariant_ProtocolMustHaveMoreThanTotalSupply() public view {
+        uint256 totalSupply = dsc.totalSupply();
+        uint256 totalWethDeposited = IERC20(weth).balanceOf(address(dsce));
+        uint256 totalWbtcDeposited = IERC20(wbtc).balanceOf(address(dsce));
+        uint256 wethValue = dsce.getUsdValue(weth, totalWethDeposited);
+        uint256 wbtcValue = dsce.getUsdValue(wbtc, totalWbtcDeposited);
+        uint256 amountRedeemed = dsce.getUsdValue(weth, totalWethDeposited + totalWbtcDeposited);
+
+        console.log("totalSupply:", totalSupply);
+        console.log("totalWethDeposited:", totalWethDeposited);
+        console.log("totalWbtcDeposited:", totalWbtcDeposited);
+        console.log("wethValue:", wethValue);
+        console.log("wbtcValue:", wbtcValue);
+        console.log("amountRedeemed:", amountRedeemed);
+
+        assert(wethValue + wbtcValue >= totalSupply);
 
     function invariant_userCanNeverRedeemMoreThanTheirCollateral() public view {
+        amountRedeemed[user] = 
+        amountCollateral[user] = s_collateralDeposited[token][user]
         console.log("timesAmountCollateralWasZero: ", timesAmountCollateralWasZero);
         console.log("amountCollateral: ", amountCollateral);
         console.log("usersWithCollateralDeposited: ", usersWithCollateralDeposited.length);
 
-        assert(amountRedeemed <= amountCollateral);
+        assert(amountRedeemed[user] <= amountCollateral[user]);
     }
 }
 // bigBagBoogy: So I think this would be the most basic thing a noob would try to exploit.
