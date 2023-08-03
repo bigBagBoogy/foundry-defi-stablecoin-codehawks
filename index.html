@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Decentralized Stable Coin</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      label {
+        display: block;
+        margin-top: 10px;
+      }
+
+      input[type="text"],
+      button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+      }
+
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      #output {
+        margin-top: 20px;
+        background-color: #f2f2f2;
+        padding: 10px;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="connectButton" onclick="connectMetamask()">
+      Connect Metamask
+    </button>
+
+    <script>
+      async function connectMetamask() {
+        if (window.ethereum) {
+          try {
+            // Request access to the user's Ethereum accounts
+            const accounts = await ethereum.request({
+              method: "eth_requestAccounts",
+            });
+            console.log("Connected MetaMask account:", accounts[0]);
+            connectButton.innerHTML = "Connected";
+            ethereum.on("chainChanged", (chainId) => {
+              console.log("Chain changed:", chainId);
+            });
+          } catch (error) {
+            console.error("Error connecting to MetaMask:", error.message);
+            connectButton.innerHTML = "Connect Metamask";
+          }
+        } else {
+          alert("Please install Metamask to use this dApp.");
+        }
+      }
+    </script>
+    <h1>Smart Contract Frontend</h1>
+
+    <label for="inputValue">Enter Value:</label>
+    <input type="text" id="inputValue" />
+
+    <button onclick="deposit()">Deposit</button>
+
+    <label for="output">Output:</label>
+    <div id="output"></div>
+
+    <script>
+      // Replace 'YourContractABI' and 'YourContractAddress' with the actual values
+      const contractABI = YourContractABI;
+      const contractAddress = "0x3e899202640a3135A9D6E540938Ab35D364CF0f5";
+
+      // Replace 'web3Provider' with your actual web3 provider (e.g., Metamask)
+      const web3Provider = new Web3.providers.HttpProvider(
+        "http://localhost:8545"
+      );
+      const web3 = new Web3(web3Provider);
+      const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+      async function deposit() {
+        const inputValue = document.getElementById("inputValue").value;
+
+        // Replace 'yourFunctionName' with the function you want to call in your smart contract
+        contract.methods
+          .yourFunctionName(inputValue)
+          .send({ from: web3.eth.defaultAccount })
+          .on("transactionHash", (hash) => {
+            document.getElementById("output").innerText =
+              "Transaction sent! Transaction hash: " + hash;
+          })
+          .on("receipt", (receipt) => {
+            document.getElementById("output").innerText =
+              "Transaction confirmed! Transaction hash: " +
+              receipt.transactionHash;
+          })
+          .on("error", (error) => {
+            document.getElementById("output").innerText =
+              "Error occurred: " + error.message;
+          });
+      }
+    </script>
+    <script src="abi.json"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

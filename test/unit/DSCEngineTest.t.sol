@@ -323,17 +323,28 @@ contract DSCEngineTest is StdCheats, Test {
         dsce.redeemCollateral(weth, 0);
         vm.stopPrank();
     }
+    // scince
 
-    function testCanRedeemCollateral() public depositedCollateral {
+    function testCanRedeemCollateral() public {
         vm.startPrank(user);
-        uint256 userBalance = ERC20Mock(weth).balanceOf(user); // user has 0
+        ERC20Mock(wbtc).approve(address(dsce), amountCollateral);
+        dsce.depositCollateral(wbtc, amountCollateral);
+
+        uint256 userBalance = ERC20Mock(wbtc).balanceOf(user); // user has 0
         console.log("userBalance", userBalance);
-        dsce.redeemCollateral(weth, amountCollateral); //redeem/withdraw all?
-        userBalance = ERC20Mock(weth).balanceOf(user); //gives out 10 ether
+        (, uint256 collateralValueInUsd) = dsce.getAccountInformation(user);
+        console.log("collateralValueInUsd", collateralValueInUsd);
+        dsce.redeemCollateral(wbtc, amountCollateral); //redeem/withdraw all?
+        userBalance = ERC20Mock(wbtc).balanceOf(user); //gives out 10 ether
         uint256 userBtcBalance = ERC20Mock(wbtc).balanceOf(user); // also gives out 10 ether.   "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" is where this funtion is. It only takes in an address account.
-        console.log("userBtcBalance", userBtcBalance);
-        console.log("userBalance", userBalance);
-        console.log("amountCollateral", amountCollateral);
+        console.log("userBtcBalance------", userBtcBalance);
+        console.log("userBalance---------", userBalance);
+        console.log("amountCollateral----", amountCollateral);
+        console.log("wbtc", wbtc);
+        console.log("weth", weth);
+        (, collateralValueInUsd) = dsce.getAccountInformation(user);
+        console.log("collateralValueInUsd", collateralValueInUsd);
+
         assertEq(userBalance, amountCollateral);
         vm.stopPrank();
     }
