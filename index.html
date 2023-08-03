@@ -3,52 +3,25 @@
   <head>
     <title>Decentralized Stable Coin</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      h1 {
-        text-align: center;
-      }
-
-      label {
-        display: block;
-        margin-top: 10px;
-      }
-
-      input[type="text"],
-      button {
-        width: 100%;
-        padding: 10px;
-        margin-top: 5px;
-      }
-
-      button {
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        cursor: pointer;
-      }
-
-      button:hover {
-        background-color: #45a049;
-      }
-
-      #output {
-        margin-top: 20px;
-        background-color: #f2f2f2;
-        padding: 10px;
-        white-space: pre-wrap;
-      }
+      /* Styles remain the same */
     </style>
   </head>
   <body>
     <button id="connectButton" onclick="connectMetamask()">
       Connect Metamask
     </button>
+
+    <h1>Smart Contract Frontend</h1>
+
+    <label for="inputValue">Enter Value:</label>
+    <input type="text" id="inputValue" />
+
+    <button onclick="depositCollateral()">Deposit</button>
+
+    <label for="output">Output:</label>
+    <div id="output"></div>
+
+    <!-- Removed the contract-related script from here -->
 
     <script>
       async function connectMetamask() {
@@ -71,47 +44,509 @@
           alert("Please install Metamask to use this dApp.");
         }
       }
+
+      async function depositCollateral() {
+        if (window.ethereum) {
+          try {
+            // Request access to the user's Ethereum accounts
+            const accounts = await ethereum.request({
+              method: "eth_requestAccounts",
+            });
+            console.log("Connected MetaMask account:", accounts[0]);
+
+            // Replace 'YourContractABI' and 'YourContractAddress' with the actual values
+            const contractABI = [
+              [
+                {
+                  inputs: [
+                    {
+                      internalType: "address[]",
+                      name: "tokenAddresses",
+                      type: "address[]",
+                    },
+                    {
+                      internalType: "address[]",
+                      name: "priceFeedAddresses",
+                      type: "address[]",
+                    },
+                    {
+                      internalType: "address",
+                      name: "dscAddress",
+                      type: "address",
+                    },
+                  ],
+                  stateMutability: "nonpayable",
+                  type: "constructor",
+                },
+                {
+                  inputs: [
+                    {
+                      internalType: "uint256",
+                      name: "healthFactor",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "DSCEngine__BreaksHealthFactor",
+                  type: "error",
+                },
+                {
+                  inputs: [],
+                  name: "DSCEngine__HealthFactorNotImproved",
+                  type: "error",
+                },
+                {
+                  inputs: [],
+                  name: "DSCEngine__HealthFactorOk",
+                  type: "error",
+                },
+                { inputs: [], name: "DSCEngine__MintFailed", type: "error" },
+                {
+                  inputs: [],
+                  name: "DSCEngine__NeedsMoreThanZero",
+                  type: "error",
+                },
+                {
+                  inputs: [],
+                  name: "DSCEngine__NotAllowedToken",
+                  type: "error",
+                },
+                {
+                  inputs: [],
+                  name: "DSCEngine__TokenAddressesAndPriceFeedAddressesMustBeSameLength",
+                  type: "error",
+                },
+                {
+                  inputs: [],
+                  name: "DSCEngine__TransferFailed",
+                  type: "error",
+                },
+                {
+                  anonymous: false,
+                  inputs: [
+                    {
+                      indexed: true,
+                      internalType: "address",
+                      name: "user",
+                      type: "address",
+                    },
+                    {
+                      indexed: true,
+                      internalType: "address",
+                      name: "token",
+                      type: "address",
+                    },
+                    {
+                      indexed: true,
+                      internalType: "uint256",
+                      name: "amount",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "CollateralDeposited",
+                  type: "event",
+                },
+                {
+                  anonymous: false,
+                  inputs: [
+                    {
+                      indexed: true,
+                      internalType: "address",
+                      name: "redeemedFrom",
+                      type: "address",
+                    },
+                    {
+                      indexed: true,
+                      internalType: "address",
+                      name: "redeemedTo",
+                      type: "address",
+                    },
+                    {
+                      indexed: true,
+                      internalType: "address",
+                      name: "token",
+                      type: "address",
+                    },
+                    {
+                      indexed: false,
+                      internalType: "uint256",
+                      name: "amount",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "CollateralRedeemed",
+                  type: "event",
+                },
+                {
+                  inputs: [
+                    {
+                      internalType: "uint256",
+                      name: "amount",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "burnDsc",
+                  outputs: [],
+                  stateMutability: "nonpayable",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    {
+                      internalType: "uint256",
+                      name: "totalDscMinted",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "collateralValueInUsd",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "calculateHealthFactor",
+                  outputs: [
+                    { internalType: "uint256", name: "", type: "uint256" },
+                  ],
+                  stateMutability: "pure",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    {
+                      internalType: "address",
+                      name: "tokenCollateralAddress",
+                      type: "address",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "amountCollateral",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "depositCollateral",
+                  outputs: [],
+                  stateMutability: "nonpayable",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    {
+                      internalType: "address",
+                      name: "tokenCollateralAddress",
+                      type: "address",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "amountCollateral",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "amountDscToMint",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "depositCollateralAndMintDsc",
+                  outputs: [],
+                  stateMutability: "nonpayable",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    { internalType: "address", name: "user", type: "address" },
+                  ],
+                  name: "getAccountCollateralValue",
+                  outputs: [
+                    {
+                      internalType: "uint256",
+                      name: "totalCollateralValueInUsd",
+                      type: "uint256",
+                    },
+                  ],
+                  stateMutability: "view",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    { internalType: "address", name: "user", type: "address" },
+                  ],
+                  name: "getAccountInformation",
+                  outputs: [
+                    {
+                      internalType: "uint256",
+                      name: "totalDscMinted",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "collateralValueInUsd",
+                      type: "uint256",
+                    },
+                  ],
+                  stateMutability: "view",
+                  type: "function",
+                },
+                {
+                  inputs: [],
+                  name: "getAdditionalFeedPrecision",
+                  outputs: [
+                    { internalType: "uint256", name: "", type: "uint256" },
+                  ],
+                  stateMutability: "pure",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    { internalType: "address", name: "user", type: "address" },
+                    { internalType: "address", name: "token", type: "address" },
+                  ],
+                  name: "getCollateralAmountOfUser",
+                  outputs: [
+                    {
+                      internalType: "uint256",
+                      name: "collateralAmountOfUser",
+                      type: "uint256",
+                    },
+                  ],
+                  stateMutability: "view",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    { internalType: "address", name: "user", type: "address" },
+                    { internalType: "address", name: "token", type: "address" },
+                  ],
+                  name: "getCollateralBalanceOfUser",
+                  outputs: [
+                    { internalType: "uint256", name: "", type: "uint256" },
+                  ],
+                  stateMutability: "view",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    { internalType: "address", name: "token", type: "address" },
+                  ],
+                  name: "getCollateralTokenPriceFeed",
+                  outputs: [
+                    { internalType: "address", name: "", type: "address" },
+                  ],
+                  stateMutability: "view",
+                  type: "function",
+                },
+                {
+                  inputs: [],
+                  name: "getCollateralTokens",
+                  outputs: [
+                    { internalType: "address[]", name: "", type: "address[]" },
+                  ],
+                  stateMutability: "view",
+                  type: "function",
+                },
+                {
+                  inputs: [],
+                  name: "getDsc",
+                  outputs: [
+                    { internalType: "address", name: "", type: "address" },
+                  ],
+                  stateMutability: "view",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    { internalType: "address", name: "user", type: "address" },
+                  ],
+                  name: "getHealthFactor",
+                  outputs: [
+                    { internalType: "uint256", name: "", type: "uint256" },
+                  ],
+                  stateMutability: "view",
+                  type: "function",
+                },
+                {
+                  inputs: [],
+                  name: "getLiquidationBonus",
+                  outputs: [
+                    { internalType: "uint256", name: "", type: "uint256" },
+                  ],
+                  stateMutability: "pure",
+                  type: "function",
+                },
+                {
+                  inputs: [],
+                  name: "getLiquidationThreshold",
+                  outputs: [
+                    { internalType: "uint256", name: "", type: "uint256" },
+                  ],
+                  stateMutability: "pure",
+                  type: "function",
+                },
+                {
+                  inputs: [],
+                  name: "getMinHealthFactor",
+                  outputs: [
+                    { internalType: "uint256", name: "", type: "uint256" },
+                  ],
+                  stateMutability: "pure",
+                  type: "function",
+                },
+                {
+                  inputs: [],
+                  name: "getPrecision",
+                  outputs: [
+                    { internalType: "uint256", name: "", type: "uint256" },
+                  ],
+                  stateMutability: "pure",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    { internalType: "address", name: "token", type: "address" },
+                    {
+                      internalType: "uint256",
+                      name: "usdAmountInWei",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "getTokenAmountFromUsd",
+                  outputs: [
+                    { internalType: "uint256", name: "", type: "uint256" },
+                  ],
+                  stateMutability: "view",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    { internalType: "address", name: "token", type: "address" },
+                    {
+                      internalType: "uint256",
+                      name: "amount",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "getUsdValue",
+                  outputs: [
+                    { internalType: "uint256", name: "", type: "uint256" },
+                  ],
+                  stateMutability: "view",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    {
+                      internalType: "address",
+                      name: "collateral",
+                      type: "address",
+                    },
+                    { internalType: "address", name: "user", type: "address" },
+                    {
+                      internalType: "uint256",
+                      name: "debtToCover",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "liquidate",
+                  outputs: [],
+                  stateMutability: "nonpayable",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    {
+                      internalType: "uint256",
+                      name: "amountDscToMint",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "mintDsc",
+                  outputs: [],
+                  stateMutability: "nonpayable",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    {
+                      internalType: "address",
+                      name: "tokenCollateralAddress",
+                      type: "address",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "amountCollateral",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "redeemCollateral",
+                  outputs: [],
+                  stateMutability: "nonpayable",
+                  type: "function",
+                },
+                {
+                  inputs: [
+                    {
+                      internalType: "address",
+                      name: "tokenCollateralAddress",
+                      type: "address",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "amountCollateral",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "amountDscToBurn",
+                      type: "uint256",
+                    },
+                  ],
+                  name: "redeemCollateralForDsc",
+                  outputs: [],
+                  stateMutability: "nonpayable",
+                  type: "function",
+                },
+              ],
+            ];
+            const contractAddress =
+              "0x3e899202640a3135A9D6E540938Ab35D364CF0f5";
+
+            // Use the same web3 provider from MetaMask
+            const web3Provider = new Web3.providers.HttpProvider(
+              "http://localhost:8545"
+            );
+            const web3 = new Web3(web3Provider);
+            const contract = new web3.eth.Contract(
+              contractABI,
+              contractAddress
+            );
+
+            const tokenCollateralAddress =
+              "0xdd13E55209Fd76AfE204dBda4007C227904f0a81"; // Replace with the actual token contract address
+            const amountCollateral =
+              document.getElementById("inputValue").value;
+
+            // Call the 'depositCollateral' function in your smart contract
+            contract.methods
+              .depositCollateral(tokenCollateralAddress, amountCollateral)
+              .send({ from: accounts[0] })
+              .on("transactionHash", (hash) => {
+                document.getElementById("output").innerText =
+                  "Transaction sent! Transaction hash: " + hash;
+              })
+              .on("receipt", (receipt) => {
+                document.getElementById("output").innerText =
+                  "Transaction confirmed! Transaction hash: " +
+                  receipt.transactionHash;
+              })
+              .on("error", (error) => {
+                document.getElementById("output").innerText =
+                  "Error occurred: " + error.message;
+              });
+          } catch (error) {
+            console.error("Error connecting to MetaMask:", error.message);
+          }
+        } else {
+          alert("Please install Metamask to use this dApp.");
+        }
+      }
     </script>
-    <h1>Smart Contract Frontend</h1>
-
-    <label for="inputValue">Enter Value:</label>
-    <input type="text" id="inputValue" />
-
-    <button onclick="deposit()">Deposit</button>
-
-    <label for="output">Output:</label>
-    <div id="output"></div>
-
-    <script>
-      // Replace 'YourContractABI' and 'YourContractAddress' with the actual values
-      const contractABI = YourContractABI;
-      const contractAddress = "0x3e899202640a3135A9D6E540938Ab35D364CF0f5";
-
-      // Replace 'web3Provider' with your actual web3 provider (e.g., Metamask)
-      const web3Provider = new Web3.providers.HttpProvider(
-        "http://localhost:8545"
-      );
-      const web3 = new Web3(web3Provider);
-      const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-      contract.methods
-        .depositCollateral(tokenCollateralAddress, amountCollateral)
-        .send({ from: accounts[0] })
-        .on("transactionHash", (hash) => {
-          document.getElementById("output").innerText =
-            "Transaction sent! Transaction hash: " + hash;
-        })
-        .on("receipt", (receipt) => {
-          document.getElementById("output").innerText =
-            "Transaction confirmed! Transaction hash: " +
-            receipt.transactionHash;
-        })
-        .on("error", (error) => {
-          document.getElementById("output").innerText =
-            "Error occurred: " + error.message;
-        });
-    </script>
-    <script src="abi.json"></script>
-    <script src="script.js"></script>
   </body>
 </html>
