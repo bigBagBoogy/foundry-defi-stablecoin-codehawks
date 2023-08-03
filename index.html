@@ -94,27 +94,22 @@
       const web3 = new Web3(web3Provider);
       const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-      async function deposit() {
-        const inputValue = document.getElementById("inputValue").value;
-
-        // Replace 'yourFunctionName' with the function you want to call in your smart contract
-        contract.methods
-          .yourFunctionName(inputValue)
-          .send({ from: web3.eth.defaultAccount })
-          .on("transactionHash", (hash) => {
-            document.getElementById("output").innerText =
-              "Transaction sent! Transaction hash: " + hash;
-          })
-          .on("receipt", (receipt) => {
-            document.getElementById("output").innerText =
-              "Transaction confirmed! Transaction hash: " +
-              receipt.transactionHash;
-          })
-          .on("error", (error) => {
-            document.getElementById("output").innerText =
-              "Error occurred: " + error.message;
-          });
-      }
+      contract.methods
+        .depositCollateral(tokenCollateralAddress, amountCollateral)
+        .send({ from: accounts[0] })
+        .on("transactionHash", (hash) => {
+          document.getElementById("output").innerText =
+            "Transaction sent! Transaction hash: " + hash;
+        })
+        .on("receipt", (receipt) => {
+          document.getElementById("output").innerText =
+            "Transaction confirmed! Transaction hash: " +
+            receipt.transactionHash;
+        })
+        .on("error", (error) => {
+          document.getElementById("output").innerText =
+            "Error occurred: " + error.message;
+        });
     </script>
     <script src="abi.json"></script>
     <script src="script.js"></script>
