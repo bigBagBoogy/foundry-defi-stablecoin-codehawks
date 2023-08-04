@@ -325,12 +325,12 @@ contract DSCEngineTest is StdCheats, Test {
     }
     // scince
 
-    function testCanRedeemCollateral() public {
+    function testBreaksWhenTryingToRedeemDifferentCollateral() public {
         vm.startPrank(user);
-        ERC20Mock(wbtc).approve(address(dsce), amountCollateral);
-        dsce.depositCollateral(wbtc, amountCollateral);
+        ERC20Mock(weth).approve(address(dsce), amountCollateral);
+        dsce.depositCollateral(weth, amountCollateral);
 
-        uint256 userBalance = ERC20Mock(wbtc).balanceOf(user); // user has 0
+        uint256 userBalance = ERC20Mock(weth).balanceOf(user); // user has 0 //contract has amountCollateral
         console.log("userBalance", userBalance);
         (, uint256 collateralValueInUsd) = dsce.getAccountInformation(user);
         console.log("collateralValueInUsd", collateralValueInUsd);
@@ -340,27 +340,10 @@ contract DSCEngineTest is StdCheats, Test {
         console.log("userBtcBalance------", userBtcBalance);
         console.log("userBalance---------", userBalance);
         console.log("amountCollateral----", amountCollateral);
-        console.log("wbtc", wbtc);
-        console.log("weth", weth);
         (, collateralValueInUsd) = dsce.getAccountInformation(user);
         console.log("collateralValueInUsd", collateralValueInUsd);
 
         assertEq(userBalance, amountCollateral);
-        vm.stopPrank();
-    }
-
-    function testBreaksWhenTryingToRedeemDifferentCollateral() public depositedCollateral /*10 ether */ {
-        vm.startPrank(user);
-        uint256 userBalance = ERC20Mock(weth).balanceOf(user);
-        console.log("userBalance", userBalance); // why is this 0?
-
-        dsce.redeemCollateral(wbtc, amountCollateral);
-
-        assertEq(userBalance, amountCollateral);
-        console.log("userBalance", userBalance);
-        console.log("amountCollateral", amountCollateral);
-        // uint256 userBalance = ERC20Mock(weth).balanceOf(user);
-        // vm.expectRevert(DSCEngine.DSCEngine__BreaksHealthFactor.selector);
         vm.stopPrank();
     }
 

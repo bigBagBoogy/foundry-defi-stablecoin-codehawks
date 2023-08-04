@@ -11,6 +11,20 @@ There's both solidity 0.8.18 and 0.8.19 versions used.
 
 slither proberen. Python 3.10.6
 
+We were not able to estimate gas. There might be an error in the contract and this transaction may fail.
+
+Network is busy. Gas prices are high and estimates are less accurate.
+
+🦊
+Market
+Gas
+(estimated)
+$81.06
+0.04420984SepoliaETH
+Likely in < 30 seconds
+Max fee:
+0.04472079SepoliaETH
+
 # end BBB
 
 [FAIL. Reason: Arithmetic over/underflow]
